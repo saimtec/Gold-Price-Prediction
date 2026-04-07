@@ -63,7 +63,7 @@ python -m uvicorn src.api:app --reload
 Run Streamlit app:
 
 ```powershell
-python -m streamlit run src/app.py
+streamlit run app.py
 ```
 
 Optional (if backend is not local):
@@ -123,12 +123,3 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
-```
-
-Connect remote and push to main branch:
-
-```powershell
-git remote add origin https://github.com/saimtec/Gold-Price-Prediction.git
-git branch -M main
-git push -u origin main
-```
