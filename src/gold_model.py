@@ -7,12 +7,14 @@ import joblib
 from pathlib import Path
 
 
-MODEL_DIR = Path("artifacts")
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_PATH = BASE_DIR / "data" / "gld_price_data.csv"
+MODEL_DIR = BASE_DIR / "artifacts"
 MODEL_PATH = MODEL_DIR / "gold_price_model.joblib"
 FEATURE_COLUMNS = ["SPX", "USO", "SLV", "EUR/USD"]
 
 
-def load_and_prepare_data(csv_path: str = "gld_price_data.csv"):
+def load_and_prepare_data(csv_path: Path = DATA_PATH):
     """Load the gold price data and split into features/target and train/test.
 
     This mirrors the logic from gold.py so the Streamlit app and script

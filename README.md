@@ -17,11 +17,11 @@ The model learns from historical data and predicts GLD price from these inputs:
 
 ## Project Structure
 
-- `train_model.py` trains the model and saves files
-- `gold_model.py` contains shared ML logic (load data, train, save, load, predict)
-- `api.py` provides REST API endpoints
-- `app.py` provides Streamlit UI
-- `gld_price_data.csv` is the dataset
+- `src/train_model.py` trains the model and saves files
+- `src/gold_model.py` contains shared ML logic (load data, train, save, load, predict)
+- `src/api.py` provides REST API endpoints
+- `src/app.py` provides Streamlit UI
+- `data/gld_price_data.csv` is the dataset
 - `artifacts/` stores generated model and metrics
 
 ## Easy Flow
@@ -51,19 +51,19 @@ pip install -r requirements.txt
 Train model:
 
 ```powershell
-python train_model.py
+python src/train_model.py
 ```
 
 Run FastAPI server:
 
 ```powershell
-python -m uvicorn api:app --reload
+python -m uvicorn src.api:app --reload
 ```
 
 Run Streamlit app:
 
 ```powershell
-python -m streamlit run app.py
+python -m streamlit run src/app.py
 ```
 
 ## API Usage
@@ -98,7 +98,7 @@ Example response:
 
 ## Notes
 
-- If prediction fails with model not found, run `python train_model.py` first.
+- If prediction fails with model not found, run `python src/train_model.py` first.
 - This project is for learning and experimentation.
 - It is not financial advice.
 

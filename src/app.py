@@ -1,14 +1,24 @@
 import streamlit as st
 import json
-from pathlib import Path
 
-from gold_model import (
-    load_and_prepare_data,
-    load_model,
-    predict_price,
-    get_feature_ranges,
-    MODEL_PATH,
-)
+try:
+    from .gold_model import (
+        load_and_prepare_data,
+        load_model,
+        predict_price,
+        get_feature_ranges,
+        MODEL_PATH,
+        MODEL_DIR,
+    )
+except ImportError:
+    from gold_model import (
+        load_and_prepare_data,
+        load_model,
+        predict_price,
+        get_feature_ranges,
+        MODEL_PATH,
+        MODEL_DIR,
+    )
 
 
 st.set_page_config(page_title="Gold Price Prediction (GLD)", layout="wide")
@@ -31,7 +41,7 @@ def _load_model():
 
 gold, X, y = _load_data()
 mins, maxs = get_feature_ranges(X)
-metrics_path = Path("artifacts") / "metrics.json"
+metrics_path = MODEL_DIR / "metrics.json"
 metrics_dict = None
 
 if metrics_path.exists():
@@ -51,14 +61,14 @@ if metrics_dict:
     st.sidebar.write(f"MAE: {metrics_dict['mae']:.4f}")
     st.sidebar.write(f"RMSE: {metrics_dict['rmse']:.4f}")
 else:
-    st.sidebar.info("Run `python train_model.py` to generate metrics.")
+    st.sidebar.info("Run `python src/train_model.py` to generate metrics.")
 
 st.sidebar.markdown("---")
 st.sidebar.write(f"Rows: {len(gold)} | Features: {X.shape[1]}")
 
 if not MODEL_PATH.exists():
     st.error(
-        "No trained model found. Run `python train_model.py` first to create artifacts/gold_price_model.joblib."
+        "No trained model found. Run `python src/train_model.py` first to create artifacts/gold_price_model.joblib."
     )
     st.stop()
 

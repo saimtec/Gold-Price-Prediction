@@ -1,16 +1,26 @@
 import json
-from pathlib import Path
 
-from gold_model import (
-    load_and_prepare_data,
-    train_random_forest,
-    evaluate_model,
-    save_model,
-    MODEL_PATH,
-)
+try:
+    from .gold_model import (
+        load_and_prepare_data,
+        train_random_forest,
+        evaluate_model,
+        save_model,
+        MODEL_PATH,
+        MODEL_DIR,
+    )
+except ImportError:
+    from gold_model import (
+        load_and_prepare_data,
+        train_random_forest,
+        evaluate_model,
+        save_model,
+        MODEL_PATH,
+        MODEL_DIR,
+    )
 
 
-METRICS_PATH = Path("artifacts") / "metrics.json"
+METRICS_PATH = MODEL_DIR / "metrics.json"
 
 
 def main():

@@ -1,7 +1,10 @@
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
-from gold_model import load_model, predict_price, FEATURE_COLUMNS
+try:
+    from .gold_model import load_model, predict_price, FEATURE_COLUMNS
+except ImportError:
+    from gold_model import load_model, predict_price, FEATURE_COLUMNS
 
 
 app = FastAPI(title="Gold Price Prediction API", version="1.0.0")
