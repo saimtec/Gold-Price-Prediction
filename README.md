@@ -117,14 +117,6 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
-## Push Your Changes To GitHub
-
-If this folder is not initialized as git yet:
-
-```powershell
-git init
-git add .
-git commit -m "Initial project setup"
 ```
 
 Connect remote and push to main branch:
