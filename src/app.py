@@ -1,22 +1,18 @@
 import streamlit as st
 import json
+import os
+import requests
 
 try:
     from .gold_model import (
         load_and_prepare_data,
-        load_model,
-        predict_price,
         get_feature_ranges,
-        MODEL_PATH,
         MODEL_DIR,
     )
 except ImportError:
     from gold_model import (
         load_and_prepare_data,
-        load_model,
-        predict_price,
         get_feature_ranges,
-        MODEL_PATH,
         MODEL_DIR,
     )
 
@@ -27,9 +23,30 @@ def _load_data():
     return gold, X, y
 
 
-@st.cache_resource
-def _load_model():
-    return load_model(MODEL_PATH)
+def _backend_url() -> str:
+    env_url = os.getenv("BACKEND_URL", "http://127.0.0.1:8000")
+    try:
+        return st.secrets.get("BACKEND_URL", env_url)
+    except Exception:
+        return env_url
+
+
+def _predict_from_api(user_values: dict) -> float:
+    payload = {
+        "spx": float(user_values["SPX"]),
+        "uso": float(user_values["USO"]),
+        "slv": float(user_values["SLV"]),
+        "eurUsd": float(user_values["EUR/USD"]),
+    }
+
+    response = requests.post(
+        f"{_backend_url().rstrip('/')}/predict",
+        json=payload,
+        timeout=20,
+    )
+    response.raise_for_status()
+    data = response.json()
+    return float(data["predicted_gld_price"])
 
 
 def main():
@@ -47,7 +64,11 @@ def main():
         metrics_dict = json.loads(metrics_path.read_text(encoding="utf-8"))
 
     st.sidebar.title("Gold Price Project")
-    st.sidebar.write("Random Forest regression on historical GLD data.")
+    st.sidebar.write("Streamlit frontend connected to FastAPI backend.")
+
+    st.sidebar.subheader("Backend URL")
+    st.sidebar.write(_backend_url())
+    st.sidebar.caption("Set BACKEND_URL in environment or Streamlit secrets for deployment.")
 
     st.sidebar.subheader("Model")
     st.sidebar.write("RandomForestRegressor (100 trees, random_state=3)")
@@ -62,14 +83,6 @@ def main():
 
     st.sidebar.markdown("---")
     st.sidebar.write(f"Rows: {len(gold)} | Features: {X.shape[1]}")
-
-    if not MODEL_PATH.exists():
-        st.error(
-            "No trained model found. Run `python src/train_model.py` first to create artifacts/gold_price_model.joblib."
-        )
-        st.stop()
-
-    model = _load_model()
 
     tab_eda, tab_predict = st.tabs(["EDA", "Make a Prediction"])
 
@@ -102,11 +115,10 @@ def main():
 
         if submit_prediction:
             try:
-                prediction = predict_price(model, user_values)
+                prediction = _predict_from_api(user_values)
                 st.success(f"Predicted GLD Price: {prediction:.2f}")
                 st.caption(
-                    "Model trained on historical data with a random train/test split. "
-                    "These predictions are for learning and experimentation, not trading."
+                    "Prediction served by FastAPI backend /predict endpoint."
                 )
             except Exception as exc:
                 st.error(f"Prediction failed: {exc}")

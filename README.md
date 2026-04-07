@@ -28,9 +28,9 @@ The model learns from historical data and predicts GLD price from these inputs:
 
 1. Run training once.
 2. Training creates model and metrics files in `artifacts/`.
-3. FastAPI and Streamlit both load the saved model.
-4. User enters feature values.
-5. App/API returns predicted GLD price.
+3. Start FastAPI backend (model is loaded there).
+4. Streamlit sends user input to FastAPI `/predict`.
+5. Streamlit shows predicted GLD price from API response.
 
 ## Output Files After Training
 
@@ -66,6 +66,12 @@ Run Streamlit app:
 python -m streamlit run src/app.py
 ```
 
+Optional (if backend is not local):
+
+```powershell
+$env:BACKEND_URL="http://127.0.0.1:8000"
+```
+
 ## API Usage
 
 Base URL after running API:
@@ -98,7 +104,7 @@ Example response:
 
 ## Notes
 
-- If prediction fails with model not found, run `python src/train_model.py` first.
+- If Streamlit cannot predict, ensure FastAPI is running and `BACKEND_URL` is correct.
 - This project is for learning and experimentation.
 - It is not financial advice.
 
