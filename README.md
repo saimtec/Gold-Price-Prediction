@@ -1,95 +1,128 @@
-# Gold Price Prediction
+# Gold Price Prediction Project
 
-This project predicts GLD price using market features.
+This project predicts the daily GLD price using market features.
 
-Architecture:
-- FastAPI backend handles model loading and prediction.
-- Streamlit frontend sends user input to backend predict API.
-- Streamlit does not need local model files in cloud deployment.
+It includes:
+- A model training script
+- A FastAPI backend for predictions
+- A Streamlit web app for user input and results
+
+## What This Project Does
+
+The model learns from historical data and predicts GLD price from these inputs:
+- SPX
+- USO
+- SLV
+- EUR/USD
 
 ## Project Structure
 
-- src/api.py: FastAPI backend endpoints
-- src/train_model.py: trains model and writes artifacts
-- src/gold_model.py: shared ML logic
-- src/app.py: Streamlit frontend (API client)
-- app.py: root launcher for Streamlit
-- data/gld_price_data.csv: dataset
-- artifacts/: generated model and metrics (backend side)
-- requirements.txt: Python dependencies
+- `src/train_model.py` trains the model and saves files
+- `src/gold_model.py` contains shared ML logic (load data, train, save, load, predict)
+- `src/api.py` provides REST API endpoints
+- `src/app.py` provides Streamlit UI
+- `data/gld_price_data.csv` is the dataset
+- `artifacts/` stores generated model and metrics
 
-## Local Run
+## Easy Flow
 
-1. Install dependencies
+1. Run training once.
+2. Training creates model and metrics files in `artifacts/`.
+3. FastAPI and Streamlit both load the saved model.
+4. User enters feature values.
+5. App/API returns predicted GLD price.
+
+## Output Files After Training
+
+When training finishes, these files are created:
+- `artifacts/gold_price_model.joblib` (trained model)
+- `artifacts/metrics.json` (R2, MAE, RMSE)
+
+## Setup
+
+Use your virtual environment and install dependencies:
+
+```powershell
 pip install -r requirements.txt
+```
 
-2. Train model once
+## Run Commands
+
+Train model:
+
+```powershell
 python src/train_model.py
+```
 
-3. Start backend
-python -m uvicorn src.api:app --host 127.0.0.1 --port 8000
+Run FastAPI server:
 
-4. Start frontend
-streamlit run app.py
+```powershell
+python -m uvicorn src.api:app --reload
+```
 
-5. Open frontend
-http://localhost:8501
+Run Streamlit app:
 
-## Deploy Backend on Render
+```powershell
+python -m streamlit run src/app.py
+```
 
-1. Create new Web Service in Render.
-2. Connect GitHub repository:
-https://github.com/saimtec/Gold-Price-Prediction
-3. Use these settings:
-- Runtime: Python
-- Branch: main
-- Build Command:
-pip install -r requirements.txt && python src/train_model.py
-- Start Command:
-uvicorn src.api:app --host 0.0.0.0 --port $PORT
-4. Deploy.
-5. Verify backend URL:
-- GET https://your-render-url.onrender.com/
-- Open docs: https://your-render-url.onrender.com/docs
+## API Usage
 
-## Deploy Frontend on Streamlit Community Cloud
+Base URL after running API:
+- `http://127.0.0.1:8000`
 
-1. Create a new Streamlit app from this GitHub repo.
-2. Set main file path to:
-app.py
-3. Add a Streamlit secret named BACKEND_URL with your Render URL.
+Health route:
+- `GET /`
 
-Example secrets value:
-BACKEND_URL = "https://your-render-url.onrender.com"
+Prediction route:
+- `POST /predict`
 
-4. Deploy app.
+Example request body:
 
-Now frontend sends prediction requests to Render backend.
-
-## API Contract
-
-POST /predict
-
-Request JSON:
+```json
 {
   "spx": 1447.16,
   "uso": 78.47,
   "slv": 15.18,
   "eurUsd": 1.471692
 }
+```
 
-Response JSON:
+Example response:
+
+```json
 {
   "predicted_gld_price": 84.98
 }
+```
 
-## Git Commands
+## Notes
 
-Clone:
+- If prediction fails with model not found, run `python src/train_model.py` first.
+- This project is for learning and experimentation.
+- It is not financial advice.
+
+## Get This Repository
+
+Clone from GitHub:
+
+```powershell
 git clone https://github.com/saimtec/Gold-Price-Prediction.git
 cd Gold-Price-Prediction
+```
 
-Push updates:
-git add .
-git commit -m "update"
-git push origin main
+Install dependencies:
+
+```powershell
+pip install -r requirements.txt
+```
+
+```
+
+Connect remote and push to main branch:
+
+```powershell
+git remote add origin https://github.com/saimtec/Gold-Price-Prediction.git
+git branch -M main
+git push -u origin main
+```
